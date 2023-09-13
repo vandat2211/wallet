@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/styles.dart';
@@ -24,7 +26,7 @@ class CreditCard extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
-        color: data.style.color,
+        // color: data.style.color,
         borderRadius: BorderRadius.circular(AppBorderRadius.xxl),
         boxShadow: [
           BoxShadow(
@@ -33,9 +35,7 @@ class CreditCard extends StatelessWidget {
           ),
         ],
         image: DecorationImage(
-          image: AssetImage(
-            'assets/images/${isFront ? data.style.frontBg : data.style.backBg}',
-          ),
+          image: FileImage(File(data.imagePath)),
           fit: BoxFit.cover,
         ),
       ),
@@ -61,53 +61,10 @@ class _CreditCardFront extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: Image(
-              image: AssetImage('assets/icons/${data.type.name}.png'),
+              image: FileImage(File(data.imagePath)),
               width: 45,
               fit: BoxFit.cover,
-              color: data.style.textColor,
             ),
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Balance',
-                      style: TextStyle(color: data.style.textColor),
-                    ),
-                    Text(
-                      r'$2,805.56',
-                      style: TextStyle(
-                        color: data.style.textColor,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      '**** **** **** ${data.number.substring(12)}',
-                      style:
-                          TextStyle(color: data.style.textColor, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Exp',
-                    style: TextStyle(color: data.style.textColor, fontSize: 16),
-                  ),
-                  Text(
-                    '01/28',
-                    style: TextStyle(color: data.style.textColor, fontSize: 16),
-                  ),
-                ],
-              ),
-            ],
           ),
         ],
       ),
@@ -130,33 +87,11 @@ class _CreditCardBack extends StatelessWidget {
         children: [
           Row(
             children: [
-              Image(
-                image: AssetImage('assets/icons/${data.type.name}.png'),
-                width: 45,
-                fit: BoxFit.cover,
-                color: data.style.textColor,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                data.name,
-                style: TextStyle(
-                  color: data.style.textColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
             ],
           ),
           Align(
             alignment: Alignment.centerRight,
-            child: Text(
-              'Ends in ${data.number.substring(12)}',
-              style: TextStyle(
-                color: data.style.textColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            child: Text(""),
           ),
         ],
       ),

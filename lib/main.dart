@@ -14,6 +14,7 @@ class WalletApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Wallet App Workshop',
       theme: AppThemes.darkTheme,
       themeMode: ThemeMode.dark,

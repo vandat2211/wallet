@@ -5,6 +5,8 @@ import 'package:wallet/core/styles.dart';
 import 'package:wallet/credit-cards/credit_card.dart';
 import 'package:wallet/on-boarding/on_boarding_page.dart';
 
+import '../sql_lite.dart';
+
 class CreditCardPage extends StatefulWidget {
   const CreditCardPage({
     required this.initialIndex,
@@ -23,10 +25,17 @@ class _CreditCardPageState extends State<CreditCardPage> {
   late final Animation<Offset> slideAnimation;
   late final PageController pageController;
   late int activeIndex;
-
+  final imageDb = ImageDatabase();
+  List<CreditCardData> cards =[];
+  Future<void> getData() async {
+    cards = await imageDb.getAllImages();
+    setState(() {
+    });
+  }
   @override
   void initState() {
     super.initState();
+    getData();
     pageController = PageController(
       initialPage: widget.initialIndex,
       viewportFraction: 0.85,
@@ -79,9 +88,8 @@ class _CreditCardPageState extends State<CreditCardPage> {
                         PageIndicator(
                           length: cards.length,
                           activeIndex: activeIndex,
-                          activeColor: cards[activeIndex].style.color,
+                          activeColor: AppColors.primary,
                         ),
-                        _buildButtons(),
                       ],
                     ),
                   ),
@@ -89,15 +97,15 @@ class _CreditCardPageState extends State<CreditCardPage> {
               ],
             ),
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: SlideTransition(
-                position: slideAnimation,
-                child: _buildLatestTransactionsSection(),
-              ),
-            ),
-          ),
+          // Expanded(
+          //   child: SingleChildScrollView(
+          //     padding: const EdgeInsets.symmetric(horizontal: 30),
+          //     child: SlideTransition(
+          //       position: slideAnimation,
+          //       child: _buildLatestTransactionsSection(),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

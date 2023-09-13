@@ -3,8 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/utils.dart';
+import 'package:wallet/core/widgets/core_toast.dart';
 import 'package:wallet/credit-cards/credit_card.dart';
 import 'package:wallet/credit-cards/credit_card_page.dart';
+import 'package:wallet/sql_lite.dart';
 
 const dragSnapDuration = Duration(milliseconds: 200);
 const pageTransitionDuration = Duration(milliseconds: 800);
@@ -23,14 +25,24 @@ class CreditCardsPage extends StatefulWidget {
 
   final VoidCallback? onCardPagePush;
   final VoidCallback? onCardPagePop;
-
   @override
   State<CreditCardsPage> createState() => _CreditCardsPageState();
 }
 
 class _CreditCardsPageState extends State<CreditCardsPage> {
   int activeCard = 0;
-
+  final imageDb = ImageDatabase();
+  List<CreditCardData> cards =[];
+  @override
+  void initState() {
+    getData();
+    super.initState();
+  }
+  Future<void> getData() async {
+    cards = await imageDb.getAllImages();
+    setState(() {
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -38,7 +50,7 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
     final cardWidth = cardHeight * creditCardAspectRatio;
 
     return Center(
-      child: SizedBox(
+      child:cards.isNotEmpty? SizedBox(
         width: cardHeight,
         height: cardWidth + (cardsOffset * (cards.length - 1)),
         child: CreditCardsStack(
@@ -57,6 +69,14 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
                   activeCard = value;
                 });
               }
+            });
+          },
+          onCardLongPress: (index) async {
+            await imageDb.deleteImage(cards[index].id!);
+            cards = await imageDb.getAllImages();
+            setState(() {
+              Toast.showLongTop("Xóa thành công");
+
             });
           },
           itemBuilder: (context, index) {
@@ -127,7 +147,7 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
             );
           },
         ),
-      ),
+      ):Container(),
     );
   }
 }
@@ -138,12 +158,13 @@ class CreditCardsStack extends StatefulWidget {
     required this.itemBuilder,
     super.key,
     this.onCardTap,
-    this.initialActiveCard = 0,
+    this.initialActiveCard = 0, this.onCardLongPress,
   });
 
   final int itemCount;
   final Widget Function(BuildContext, int) itemBuilder;
   final ValueChanged<int>? onCardTap;
+  final ValueChanged<int>? onCardLongPress;
   final int initialActiveCard;
 
   @override
@@ -284,6 +305,7 @@ class _CreditCardsStackState extends State<CreditCardsStack>
                       onPanStart: _onPanStart,
                       onPanUpdate: _onPanUpdate,
                       onPanEnd: _onPanEnd,
+                      onLongPress:()=> widget.onCardLongPress?.call(modIndex),
                       onTap: dragOffset == Offset.zero
                           ? () => widget.onCardTap?.call(modIndex)
                           : null,

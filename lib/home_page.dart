@@ -5,6 +5,7 @@ import 'package:wallet/core/styles.dart';
 import 'package:wallet/core/widgets/wallet.dart';
 import 'package:wallet/credit-cards/credit_cards_page.dart';
 import 'package:wallet/payment/payment_bottom_sheet.dart';
+import 'package:wallet/sql_lite.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +17,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int currentPageIndex = 0;
 
-  final List<TabItem> tabItems = [
+   List<TabItem> tabItems = [
     const TabItem(
       title: 'Cards',
       view: CreditCardsPage(),
@@ -82,8 +83,8 @@ class _HomePageState extends State<HomePage> {
                       Constants.walletStrapWidth * 0.6,
                     ),
                   ),
-                  onPressed: () {
-                    showModalBottomSheet<void>(
+                  onPressed: () async {
+                    var newData = await showModalBottomSheet<CreditCardData>(
                       context: context,
                       backgroundColor: AppColors.onBlack,
                       elevation: 0,
@@ -96,8 +97,13 @@ class _HomePageState extends State<HomePage> {
                           topLeft: Radius.circular(25),
                         ),
                       ),
-                      builder: (context) => const PaymentBottomSheet(),
-                    );
+                      builder: (context) =>  const PaymentBottomSheet());
+                    if(newData!=null){
+                     setState(() {
+                       currentPageIndex = 1;
+                     });
+
+                    }
                   },
                 ),
               ),

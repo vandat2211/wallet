@@ -1,22 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:wallet/core/styles.dart';
 
+// class CreditCardData {
+//   const CreditCardData({
+//     required this.id,
+//     required this.name,
+//     required this.type,
+//     this.number = '1234567812345678',
+//     this.style = CreditCardStyle.primary,
+//   });
+//
+//   final int id;
+//   final String name;
+//   final String number;
+//   final CreditCardStyle style;
+//   final CreditCardType type;
+// }
 class CreditCardData {
   const CreditCardData({
-    required this.id,
+     this.id,
     required this.name,
-    required this.type,
-    this.number = '1234567812345678',
-    this.style = CreditCardStyle.primary,
+    required this.imagePath,
+    required this.imagePath2
   });
 
-  final int id;
+  final int? id;
   final String name;
-  final String number;
-  final CreditCardStyle style;
-  final CreditCardType type;
+  final String imagePath;
+  final String imagePath2;
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'imagePath': imagePath,
+    };
+  }
 }
-
 enum CreditCardType {
   visa,
   masterCard;
@@ -102,37 +121,6 @@ const List<OnBoardingItem> onBoardingItems = [
   ),
 ];
 
-const cards = [
-  CreditCardData(
-    id: 0,
-    name: 'Central Bank',
-    type: CreditCardType.visa,
-  ),
-  CreditCardData(
-    id: 1,
-    name: 'Bank of Commerce',
-    style: CreditCardStyle.secondary,
-    type: CreditCardType.masterCard,
-  ),
-  CreditCardData(
-    id: 2,
-    name: 'Central Bank',
-    style: CreditCardStyle.accent,
-    type: CreditCardType.visa,
-  ),
-  CreditCardData(
-    id: 3,
-    name: 'Central Bank',
-    style: CreditCardStyle.onBlack,
-    type: CreditCardType.masterCard,
-  ),
-  CreditCardData(
-    id: 4,
-    name: 'Bank of Commerce',
-    style: CreditCardStyle.onWhite,
-    type: CreditCardType.visa,
-  ),
-];
 
 class Transaction {
   const Transaction({

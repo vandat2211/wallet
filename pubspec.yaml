@@ -37,6 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   font_awesome_flutter: ^10.5.0
   widgetbook: ^3.2.0
+  sqflite: ^2.0.0+3
+  image_picker: ^1.0.1
+  fluttertoast: ^8.0.3
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

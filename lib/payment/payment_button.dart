@@ -1,21 +1,28 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:wallet/core/data.dart';
 import 'package:wallet/core/styles.dart';
+import 'package:wallet/core/widgets/core_toast.dart';
+import 'package:wallet/sql_lite.dart';
 
 
 const dragSnapDuration = Duration(milliseconds: 300);
 const draggableMinWidth = 60.0;
 
 class PaymentButton extends StatefulWidget {
-  const PaymentButton({
+   PaymentButton({
     super.key,
     this.enabled = false,
-    this.width = 100,
+    this.width = 100, required this.onSuccess, required this.status, required this.data,
+
   });
 
   final bool enabled;
   final double width;
+  final VoidCallback onSuccess;
+  final PaymentStatus status;
+   CreditCardData? data;
 
   @override
   State<PaymentButton> createState() => _PaymentButtonState();
@@ -24,7 +31,6 @@ class PaymentButton extends StatefulWidget {
 class _PaymentButtonState extends State<PaymentButton>
     with TickerProviderStateMixin {
   late final AnimationController loadingAnimationController;
-
   double dragOffset = 0;
   Duration dragDuration = Duration.zero;
   static const draggableMinWidth = 60.0;
@@ -40,24 +46,33 @@ class _PaymentButtonState extends State<PaymentButton>
   double get dragThreshold => maxDraggableDistance * 0.8;
 
   void _handleHorizontalDragStart(DragStartDetails details) {
-    if (dragDuration > Duration.zero) {
-      dragDuration = Duration.zero;
+    if(widget.data!=null){
+      if (dragDuration > Duration.zero) {
+        dragDuration = Duration.zero;
+      }
+    }else{
+      Toast.showLongTop("Bạn chưa chọn hình ảnh cho thẻ");
     }
+
   }
 
   void _handleHorizontalDragUpdate(DragUpdateDetails details) {
-    if (canDrag) {
-      setState(() {
-        dragOffset =
-            (dragOffset + details.delta.dx).clamp(0, maxDraggableDistance);
-        if (!status.isPending) {
-          status = PaymentStatus.pending;
-        }
-      });
+    if(widget.data!=null){
+      if (canDrag) {
+        setState(() {
+          dragOffset =
+              (dragOffset + details.delta.dx).clamp(0, maxDraggableDistance);
+          if (!status.isPending) {
+            status = PaymentStatus.pending;
+          }
+        });
+      }
     }
+
   }
 
   void _handleHorizontalDragEnd(DragEndDetails details) {
+    if(widget.data!=null){
     if (!status.isSuccess) {
       dragDuration = dragSnapDuration;
       if (dragOffset <= dragThreshold) {
@@ -74,15 +89,17 @@ class _PaymentButtonState extends State<PaymentButton>
         Future<void>.delayed(const Duration(milliseconds: 1500)).then((value) {
           setState(() {
             status = PaymentStatus.success;
+            widget.onSuccess.call();
           });
         });
       }
-    }
+    }}
   }
 
   @override
   void initState() {
     super.initState();
+    status = widget.status;
     loadingAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -183,12 +200,12 @@ class _PaymentButtonState extends State<PaymentButton>
       ),
     );
   }
-
+  bool isSuccessPrinted = false;
   Widget _buildDollarIcon(
     BuildContext context, {
     double dragOffset = 0,
     double loadingAnimationValue = 0,
-  }) {
+  })  {
     final yRotation = status.isPending
         ? 4 * pi * (dragOffset / maxDraggableDistance)
         : status.isLoading
@@ -198,10 +215,7 @@ class _PaymentButtonState extends State<PaymentButton>
     Widget child = SizedBox(
       width: 60,
       child: Center(
-        child: Image.asset(
-          'assets/icons/dollar.png',
-          width: 30,
-        ),
+        child: Icon(Icons.image,size: 40,),
       ),
     );
 
@@ -233,7 +247,6 @@ class _PaymentButtonState extends State<PaymentButton>
       ),
       child: child,
     );
-
     return child;
   }
 }
