@@ -29,6 +29,13 @@ class ImageDatabase {
     await initDatabase();
      await _database?.delete('images',where: "id = ?", whereArgs:[id]);
   }
+  Future<void> deleteMultipleImages(List<int> imageIds) async {
+    await initDatabase();
+    await _database?.delete(
+      'images',
+      where: 'id IN (${imageIds.join(', ')})',
+    );
+  }
 
   Future<List<CreditCardData>> getAllImages() async {
     await initDatabase();

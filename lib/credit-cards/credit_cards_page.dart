@@ -40,7 +40,6 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
   }
   Future<void> getData() async {
     cards = await imageDb.getAllImages();
-    print("cards: ${cards[0].toMap()}");
     setState(() {
     });
   }
@@ -50,105 +49,110 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
     final cardHeight = screenSize.width * 0.75;
     final cardWidth = cardHeight * creditCardAspectRatio;
 
-    return Center(
-      child:cards.isNotEmpty? SizedBox(
-        width: cardHeight,
-        height: cardWidth + (cardsOffset * (cards.length - 1)),
-        child: CreditCardsStack(
-          itemCount: cards.length,
-          initialActiveCard: activeCard,
-          onCardTap: (index) {
-            pushFadeInRoute(
-              context,
-              pageBuilder: (context, animation, __) => CreditCardPage(
-                initialIndex: index,
-                pageTransitionAnimation: animation, cards: cards,
-              ),
-            ).then((value) {
-              if (value != null && value is int) {
-                setState(() {
-                  activeCard = value;
-                });
-              }
-            });
-          },
-          onCardLongPress: (index) async {
-            await imageDb.deleteImage(cards[index].id!);
-            cards = await imageDb.getAllImages();
-            setState(() {
-              Toast.showLongTop("Xóa thành công");
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Cards"),
+      ),
+      body: Center(
+        child:cards.isNotEmpty? SizedBox(
+          width: cardHeight,
+          height: cardWidth + (cardsOffset * (cards.length - 1)),
+          child: CreditCardsStack(
+            itemCount: cards.length,
+            initialActiveCard: activeCard,
+            onCardTap: (index) {
+              pushFadeInRoute(
+                context,
+                pageBuilder: (context, animation, __) => CreditCardPage(
+                  initialIndex: index,
+                  pageTransitionAnimation: animation, cards: cards,
+                ),
+              ).then((value) {
+                if (value != null && value is int) {
+                  setState(() {
+                    activeCard = value;
+                  });
+                }
+              });
+            },
+            onCardLongPress: (index) async {
+              await imageDb.deleteImage(cards[index].id!);
+              cards = await imageDb.getAllImages();
+              setState(() {
+                Toast.showLongTop("Xóa thành công");
 
-            });
-          },
-          itemBuilder: (context, index) {
-            return Align(
-              widthFactor: cardHeight / cardWidth,
-              heightFactor: cardWidth / cardHeight,
-              child: Hero(
-                tag: 'card_${cards[index].id}',
-                flightShuttleBuilder: (
-                  BuildContext context,
-                  Animation<double> animation,
-                  _,
-                  __,
-                  ___,
-                ) {
-                  final rotationAnimation =
-                      Tween<double>(begin: -pi / 2, end: pi).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOut,
-                    ),
-                  );
-
-                  final flipAnimation =
-                      Tween<double>(begin: 0, end: pi).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: const Interval(
-                        0.3,
-                        1,
+              });
+            },
+            itemBuilder: (context, index) {
+              return Align(
+                widthFactor: cardHeight / cardWidth,
+                heightFactor: cardWidth / cardHeight,
+                child: Hero(
+                  tag: 'card_${cards[index].id}',
+                  flightShuttleBuilder: (
+                    BuildContext context,
+                    Animation<double> animation,
+                    _,
+                    __,
+                    ___,
+                  ) {
+                    final rotationAnimation =
+                        Tween<double>(begin: -pi / 2, end: pi).animate(
+                      CurvedAnimation(
+                        parent: animation,
                         curve: Curves.easeOut,
                       ),
-                    ),
-                  );
+                    );
 
-                  return Material(
-                    color: Colors.transparent,
-                    child: AnimatedBuilder(
-                      animation: animation,
-                      builder: (context, child) {
-                        return Transform(
-                          transform: Matrix4.identity()
-                            ..setEntry(3, 2, 0.001)
-                            ..rotateZ(rotationAnimation.value)
-                            ..rotateX(flipAnimation.value),
-                          alignment: Alignment.center,
-                          child: Transform.flip(
-                            flipX: animation.value > 0.5,
-                            child: CreditCard(
-                              width: cardWidth,
-                              data: cards[index],
-                              isFront: animation.value > 0.5,
+                    final flipAnimation =
+                        Tween<double>(begin: 0, end: pi).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: const Interval(
+                          0.3,
+                          1,
+                          curve: Curves.easeOut,
+                        ),
+                      ),
+                    );
+
+                    return Material(
+                      color: Colors.transparent,
+                      child: AnimatedBuilder(
+                        animation: animation,
+                        builder: (context, child) {
+                          return Transform(
+                            transform: Matrix4.identity()
+                              ..setEntry(3, 2, 0.001)
+                              ..rotateZ(rotationAnimation.value)
+                              ..rotateX(flipAnimation.value),
+                            alignment: Alignment.center,
+                            child: Transform.flip(
+                              flipX: animation.value > 0.5,
+                              child: CreditCard(
+                                width: cardWidth,
+                                data: cards[index],
+                                isFront: animation.value > 0.5,
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
+                    );
+                  },
+                  child: Transform.rotate(
+                    angle: -pi / 2,
+                    child: CreditCard(
+                      width: cardWidth,
+                      data: cards[index],
                     ),
-                  );
-                },
-                child: Transform.rotate(
-                  angle: -pi / 2,
-                  child: CreditCard(
-                    width: cardWidth,
-                    data: cards[index],
                   ),
                 ),
-              ),
-            );
-          },
-        ),
-      ):Container(),
+              );
+            },
+          ),
+        ):Container(),
+      ),
     );
   }
 }
