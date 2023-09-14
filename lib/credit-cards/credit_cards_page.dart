@@ -40,6 +40,7 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
   }
   Future<void> getData() async {
     cards = await imageDb.getAllImages();
+    print("cards: ${cards[0].toMap()}");
     setState(() {
     });
   }
@@ -61,7 +62,7 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
               context,
               pageBuilder: (context, animation, __) => CreditCardPage(
                 initialIndex: index,
-                pageTransitionAnimation: animation,
+                pageTransitionAnimation: animation, cards: cards,
               ),
             ).then((value) {
               if (value != null && value is int) {

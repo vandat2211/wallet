@@ -1,4 +1,8 @@
+import 'dart:math';
+
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:wallet/core/constants.dart';
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/styles.dart';
@@ -8,12 +12,13 @@ import 'package:wallet/on-boarding/on_boarding_page.dart';
 import '../sql_lite.dart';
 
 class CreditCardPage extends StatefulWidget {
-  const CreditCardPage({
+   CreditCardPage({
     required this.initialIndex,
     required this.pageTransitionAnimation,
+    required this.cards,
     super.key,
   });
-
+  List<CreditCardData> cards;
   final int initialIndex;
   final Animation<double> pageTransitionAnimation;
 
@@ -24,23 +29,51 @@ class CreditCardPage extends StatefulWidget {
 class _CreditCardPageState extends State<CreditCardPage> {
   late final Animation<Offset> slideAnimation;
   late final PageController pageController;
+  TextRecognizer textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
   late int activeIndex;
   final imageDb = ImageDatabase();
   List<CreditCardData> cards =[];
-  Future<void> getData() async {
-    cards = await imageDb.getAllImages();
-    setState(() {
-    });
+  Future<void> _getInformationFromIDCard() async {
+    try {
+      final InputImage inputImage = InputImage.fromFilePath(cards[widget.initialIndex].imagePath);
+
+      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+      String name = "";
+      recognizedText.blocks.forEach((element) {
+      if(element.text.contains('name')){
+        print("ok:${element.text.split(': ')[1]}");
+      }
+      });
+      for (TextBlock block in recognizedText.blocks) {
+        if(block.text.contains('name')){
+          name = recognizedText.text.split(': ')[1];
+          break;
+        }
+        final Rect rect = block.boundingBox;
+        final List<Point<int>> cornerPoints = block.cornerPoints;
+        final String text = block.text;
+        final List<String> languages = block.recognizedLanguages;
+
+        for (TextLine line in block.lines) {
+          // Same getters as TextBlock
+          for (TextElement element in line.elements) {
+            // Same getters as TextBlock
+          }
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
   @override
   void initState() {
     super.initState();
-    getData();
+    cards = widget.cards;
+    activeIndex = widget.initialIndex;
     pageController = PageController(
       initialPage: widget.initialIndex,
       viewportFraction: 0.85,
     );
-    activeIndex = widget.initialIndex;
     slideAnimation = Tween<Offset>(
       begin: const Offset(0, 1.5),
       end: Offset.zero,
@@ -51,7 +84,11 @@ class _CreditCardPageState extends State<CreditCardPage> {
       ),
     );
   }
-
+@override
+  void dispose() {
+  textRecognizer.close();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,15 +134,15 @@ class _CreditCardPageState extends State<CreditCardPage> {
               ],
             ),
           ),
-          // Expanded(
-          //   child: SingleChildScrollView(
-          //     padding: const EdgeInsets.symmetric(horizontal: 30),
-          //     child: SlideTransition(
-          //       position: slideAnimation,
-          //       child: _buildLatestTransactionsSection(),
-          //     ),
-          //   ),
-          // ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: SlideTransition(
+                position: slideAnimation,
+                child: _buildLatestTransactionsSection(),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -129,10 +166,24 @@ class _CreditCardPageState extends State<CreditCardPage> {
               enabled: index == activeIndex,
               child: Hero(
                 tag: 'card_${cards[index].id}',
-                child: CreditCard(
-                  width: cardWidth,
-                  data: cards[index],
-                  isFront: true,
+                child: FlipCard(
+                  direction: FlipDirection.HORIZONTAL,
+                  front: Card(
+                    elevation: 5,
+                    child: CreditCard(
+                      width: cardWidth,
+                      data: cards[index],
+                      isFront: true,
+                    ),
+                  ),
+                  back: Card(
+                    elevation: 5,
+                    child: CreditCard(
+                      width: cardWidth,
+                      data: cards[index],
+                      isFront: false,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -170,7 +221,7 @@ class _CreditCardPageState extends State<CreditCardPage> {
       children: [
         const SizedBox(height: 15),
         const Text(
-          'Latest Transactions',
+          'Thông tin',
           style: TextStyle(
             color: AppColors.black,
             fontWeight: FontWeight.w600,
@@ -178,12 +229,7 @@ class _CreditCardPageState extends State<CreditCardPage> {
           ),
         ),
         const SizedBox(height: 15),
-        ...List.generate(
-          transactions.length,
-          (index) => _TransactionItem(
-            transactions[index],
-          ),
-        ),
+
         SizedBox(height: MediaQuery.of(context).padding.bottom),
       ],
     );

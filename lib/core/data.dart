@@ -33,6 +33,7 @@ class CreditCardData {
       'id': id,
       'name': name,
       'imagePath': imagePath,
+      'imagePath2': imagePath2
     };
   }
 }

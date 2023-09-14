@@ -14,14 +14,13 @@ class PaymentButton extends StatefulWidget {
    PaymentButton({
     super.key,
     this.enabled = false,
-    this.width = 100, required this.onSuccess, required this.status, required this.data,
+    this.width = 100, required this.onSuccess, required this.data,
 
   });
 
   final bool enabled;
   final double width;
   final VoidCallback onSuccess;
-  final PaymentStatus status;
    CreditCardData? data;
 
   @override
@@ -99,7 +98,6 @@ class _PaymentButtonState extends State<PaymentButton>
   @override
   void initState() {
     super.initState();
-    status = widget.status;
     loadingAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),

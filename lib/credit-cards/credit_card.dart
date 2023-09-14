@@ -34,13 +34,17 @@ class CreditCard extends StatelessWidget {
             blurRadius: 15,
           ),
         ],
-        image: DecorationImage(
+        image:isFront ?DecorationImage(
+          image: FileImage(File(data.imagePath2)),
+          fit: BoxFit.cover,
+        )
+        :DecorationImage(
           image: FileImage(File(data.imagePath)),
           fit: BoxFit.cover,
         ),
       ),
       clipBehavior: Clip.hardEdge,
-      child: isFront ? _CreditCardFront(data) : _CreditCardBack(data),
+      // child: isFront ? _CreditCardFront(data) : _CreditCardBack(data),
     );
   }
 }

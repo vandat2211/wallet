@@ -47,15 +47,19 @@ class _PaymentBottomSheetState extends State<PaymentBottomSheet> {
     final cardsEntries = <DropdownMenuEntry<int>>[
       DropdownMenuEntry<int>(
         value: 0,
-        label: 'thẻ căn cước',
+        label: 'Thẻ căn cước',
       ),
       DropdownMenuEntry<int>(
         value: 1,
-        label: 'thẻ ngân hàng',
+        label: 'Thẻ ngân hàng',
       ),
       DropdownMenuEntry<int>(
         value: 2,
-        label: 'bằng lái xe',
+        label: 'Bằng lái xe',
+      ),
+      DropdownMenuEntry<int>(
+        value: 3,
+        label: 'Ảnh',
       ),
     ];
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
@@ -68,6 +72,7 @@ class _PaymentBottomSheetState extends State<PaymentBottomSheet> {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DropdownMenu<int>(
             controller: sendingCardsController,
@@ -84,6 +89,8 @@ class _PaymentBottomSheetState extends State<PaymentBottomSheet> {
             },
           ),
           const SizedBox(height: 20),
+          Text("Ảnh mặt trước"),
+          const SizedBox(height: 10),
           InkWell(
             onTap: () async {
               final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -141,31 +148,38 @@ class _PaymentBottomSheetState extends State<PaymentBottomSheet> {
             },
             child: Visibility(
               visible: path.isNotEmpty,
-              child: Container(
-                width: cardWidth,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: AppColors.accent,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.black.withOpacity(0.5),
-                      blurRadius: 15,
+              child: Column(
+                crossAxisAlignment:CrossAxisAlignment.start,
+                children: [
+                  Text("Ảnh mặt sau"),
+                  const SizedBox(height: 10),
+                  Container(
+                    width: cardWidth,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: AppColors.accent,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withOpacity(0.5),
+                          blurRadius: 15,
+                        ),
+                      ],
+                      image:path2.isNotEmpty?
+                      DecorationImage(
+                        image: FileImage(File(path2)),
+                        fit: BoxFit.cover,
+                      ) : const DecorationImage(
+                        image: AssetImage(
+                          'assets/images/secondary-pattern-back.png',
+                        ),
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ],
-                  image:path2.isNotEmpty?
-                  DecorationImage(
-                    image: FileImage(File(path2)),
-                    fit: BoxFit.cover,
-                  ) : const DecorationImage(
-                    image: AssetImage(
-                      'assets/images/secondary-pattern-back.png',
-                    ),
-                    fit: BoxFit.cover,
+                    clipBehavior: Clip.hardEdge,
+                    child:path2.isNotEmpty?null: const Icon(Icons.add,size: 50),
                   ),
-                ),
-                clipBehavior: Clip.hardEdge,
-                child:path2.isNotEmpty?null: const Icon(Icons.add,size: 50),
+                ],
               ),
             ),
           ),
@@ -176,7 +190,7 @@ class _PaymentBottomSheetState extends State<PaymentBottomSheet> {
           async {
               await imageDb.insertImage(imageItem!);
               navigatorKey?.pop(imageItem);
-              }, status: status, data: imageItem,
+              }, data: imageItem,
           ),
         ],
       ),
