@@ -170,8 +170,9 @@ class _NotificationsPageState extends State<_NotificationsPage> {
             }
           }
           setState(() {
-
-          });
+            if(cards.isNotEmpty) listID.clear();
+            }
+          );
         },)],
       ),
     body: Padding(
