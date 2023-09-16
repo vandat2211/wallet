@@ -4,9 +4,12 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/styles.dart';
-import 'package:wallet/credit-cards/credit_card.dart';
 
-import '../core/constants.dart';
+
+
+
+import '../../core/constants/constants.dart';
+import 'credit_card.dart';
 
 class detailImagePage extends StatefulWidget {
    detailImagePage({super.key, required this.initialIndex, required this.pageTransitionAnimation,required this.cards});

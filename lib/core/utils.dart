@@ -42,3 +42,22 @@ int getModIndexFromActiveIndex(
 double getScaleByIndex(int index, double min, double max, int count) {
   return min + ((max - min) / count) * (index + 1);
 }
+class Utils {
+  static String getCurrentTimeStringRequest() {
+    final DateTime nowDate = DateTime.now();
+    return nowDate.year.toString() +
+        format2Digit(nowDate.month) +
+        format2Digit(nowDate.day) +
+        format2Digit(nowDate.hour) +
+        format2Digit(nowDate.minute) +
+        format2Digit(nowDate.second);
+  }
+  /// sample: 2 => 02 */
+  static String format2Digit(int n) {
+    if (n < 10) {
+      return '0' + n.toString();
+    } else {
+      return n.toString();
+    }
+  }
+}

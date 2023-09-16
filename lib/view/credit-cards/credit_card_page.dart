@@ -3,13 +3,17 @@ import 'dart:math';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:wallet/core/constants.dart';
+
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/styles.dart';
-import 'package:wallet/credit-cards/credit_card.dart';
-import 'package:wallet/on-boarding/on_boarding_page.dart';
 
-import '../sql_lite.dart';
+import 'package:wallet/view/credit-cards/credit_card.dart';
+import 'package:wallet/view/on-boarding/on_boarding_page.dart';
+
+
+import '../../core/constants/constants.dart';
+import '../../core/data_local/sql_lite.dart';
+
 
 class CreditCardPage extends StatefulWidget {
    CreditCardPage({

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/styles.dart';
 import 'package:wallet/core/widgets/core_toast.dart';
-import 'package:wallet/sql_lite.dart';
+import 'package:wallet/core/data_local/sql_lite.dart';
 
 
 const dragSnapDuration = Duration(milliseconds: 300);

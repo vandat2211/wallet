@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wallet/core/constants.dart';
+
 import 'package:wallet/core/styles.dart';
 import 'package:wallet/core/widgets/dashed_border_container.dart';
+
+import '../constants/constants.dart';
 
 class Wallet extends StatelessWidget {
   const Wallet({

@@ -1,16 +1,22 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:wallet/core/constants.dart';
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/styles.dart';
 import 'package:wallet/core/widgets/wallet.dart';
-import 'package:wallet/credit-cards/credit_card_page.dart';
-import 'package:wallet/credit-cards/credit_cards_page.dart';
-import 'package:wallet/credit-cards/detail_image.dart';
-import 'package:wallet/payment/payment_bottom_sheet.dart';
-import 'package:wallet/sql_lite.dart';
+
+
+import 'package:wallet/core/data_local/sql_lite.dart';
+import 'package:wallet/view/payment/payment_bottom_sheet.dart';
+
+import '../core/constants/constants.dart';
+import '../core/form_Submission_Status.dart';
+import '../view_model/credit_card_bloc/credit_card_bloc.dart';
+import 'credit-cards/credit_cards_page.dart';
+import 'credit-cards/detail_image.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,9 +29,11 @@ class _HomePageState extends State<HomePage> {
   int currentPageIndex = 0;
 
    List<TabItem> tabItems = [
-    const TabItem(
+     TabItem(
       title: 'Cards',
-      view: CreditCardsPage(),
+      view: BlocProvider(
+        create: (context) => CreditCardBloc(),
+          child: CreditCardsPage()),
     ),
     TabItem(view: Container()),
     const TabItem(
@@ -91,7 +99,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     onPressed: () async {
-                      var newData = await showModalBottomSheet<CreditCardData>(
+                      await showModalBottomSheet<String>(
                         context: context,
                         backgroundColor: AppColors.onBlack,
                         elevation: 0,
@@ -104,13 +112,8 @@ class _HomePageState extends State<HomePage> {
                             topLeft: Radius.circular(25),
                           ),
                         ),
-                        builder: (context) =>  const PaymentBottomSheet());
-                      if(newData!=null){
-                       setState(() {
-                         currentPageIndex = 1;
-                       });
-
-                      }
+                        builder: (context1) =>   PaymentBottomSheet(myFunction: () {
+                        },));
                     },
                   ),
                 ),

@@ -3,8 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/styles.dart';
+import 'package:wallet/core/utils.dart';
 import 'package:wallet/core/widgets/wallet.dart';
-import 'package:wallet/home_page.dart';
+import 'package:wallet/data/base_service/repository_impl.dart';
+import 'package:wallet/login_model.dart';
+import 'package:wallet/view/home_page.dart';
+
+import '../../core/constants/constants.dart';
 
 class OnBoardingPage extends StatefulWidget {
   const OnBoardingPage({super.key});
@@ -15,6 +20,7 @@ class OnBoardingPage extends StatefulWidget {
 
 class _OnBoardingPageState extends State<OnBoardingPage>
     with SingleTickerProviderStateMixin {
+  final repositoryImpl = RepositoryImpl();
   late final AnimationController animationController;
   late final Animation<double> rotationAnimation;
   late final PageController pageController;
@@ -146,12 +152,25 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                     activeIndex: activeIndex,
                   ),
                   FilledButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (context) => const HomePage(),
                         ),
                       );
+                      // await repositoryImpl.login(
+                      //     LoginRequest(
+                      //       requestId: Utils.getCurrentTimeStringRequest(),
+                      //       userName: "8399246453",
+                      //       passWord: "111111",
+                      //       version: '1.0',
+                      //       lang: 'vi_VN',
+                      //       otpNo: "",
+                      //       operatingSystem: Constants.PLATFORM,
+                      //       tokenPush: "",
+                      //       deviceId: "sdk_gphone64_x86_64",
+                      //     ),
+                      // context, Constants.FINGERPRINT_N);
                     },
                     child: const Text(
                       'Get Started!',

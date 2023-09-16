@@ -1,12 +1,17 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/utils.dart';
 import 'package:wallet/core/widgets/core_toast.dart';
-import 'package:wallet/credit-cards/credit_card.dart';
-import 'package:wallet/credit-cards/credit_card_page.dart';
-import 'package:wallet/sql_lite.dart';
+
+import 'package:wallet/core/data_local/sql_lite.dart';
+
+import '../../core/form_Submission_Status.dart';
+import '../../view_model/credit_card_bloc/credit_card_bloc.dart';
+import 'credit_card.dart';
+import 'credit_card_page.dart';
 
 const dragSnapDuration = Duration(milliseconds: 200);
 const pageTransitionDuration = Duration(milliseconds: 800);
@@ -31,17 +36,11 @@ class CreditCardsPage extends StatefulWidget {
 
 class _CreditCardsPageState extends State<CreditCardsPage> {
   int activeCard = 0;
-  final imageDb = ImageDatabase();
   List<CreditCardData> cards =[];
   @override
   void initState() {
-    getData();
+    BlocProvider.of<CreditCardBloc>(context).add(GetDataEvent());
     super.initState();
-  }
-  Future<void> getData() async {
-    cards = await imageDb.getAllImages();
-    setState(() {
-    });
   }
   @override
   Widget build(BuildContext context) {
@@ -53,105 +52,111 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
       appBar: AppBar(
         title: Text("Cards"),
       ),
-      body: Center(
-        child:cards.isNotEmpty? SizedBox(
-          width: cardHeight,
-          height: cardWidth + (cardsOffset * (cards.length - 1)),
-          child: CreditCardsStack(
-            itemCount: cards.length,
-            initialActiveCard: activeCard,
-            onCardTap: (index) {
-              pushFadeInRoute(
-                context,
-                pageBuilder: (context, animation, __) => CreditCardPage(
-                  initialIndex: index,
-                  pageTransitionAnimation: animation, cards: cards,
-                ),
-              ).then((value) {
-                if (value != null && value is int) {
-                  setState(() {
-                    activeCard = value;
+      body: BlocConsumer<CreditCardBloc, CreditCardState>(
+        listener: (context,state){
+          final formStatus = state.formStatus;
+          if(formStatus is SubmissionSuccessDelete){
+            Toast.showLongTop("Xóa thành công");
+          }
+        },
+        builder: (context, state){
+          cards = state.cards;
+          return Center(
+            child:cards.isNotEmpty? SizedBox(
+              width: cardHeight,
+              height: cardWidth + (cardsOffset * (cards.length - 1)),
+              child: CreditCardsStack(
+                itemCount: cards.length,
+                initialActiveCard: activeCard,
+                onCardTap: (index) {
+                  pushFadeInRoute(
+                    context,
+                    pageBuilder: (context, animation, __) => CreditCardPage(
+                      initialIndex: index,
+                      pageTransitionAnimation: animation, cards: cards,
+                    ),
+                  ).then((value) {
+                    if (value != null && value is int) {
+                      setState(() {
+                        activeCard = value;
+                      });
+                    }
                   });
-                }
-              });
-            },
-            onCardLongPress: (index) async {
-              await imageDb.deleteImage(cards[index].id!);
-              cards = await imageDb.getAllImages();
-              setState(() {
-                Toast.showLongTop("Xóa thành công");
-
-              });
-            },
-            itemBuilder: (context, index) {
-              return Align(
-                widthFactor: cardHeight / cardWidth,
-                heightFactor: cardWidth / cardHeight,
-                child: Hero(
-                  tag: 'card_${cards[index].id}',
-                  flightShuttleBuilder: (
-                    BuildContext context,
-                    Animation<double> animation,
-                    _,
-                    __,
-                    ___,
-                  ) {
-                    final rotationAnimation =
+                },
+                onCardLongPress: (index) {
+                  BlocProvider.of<CreditCardBloc>(context).add(DeleteCardEvent(cards[index].id!));
+                },
+                itemBuilder: (context, index) {
+                  return Align(
+                    widthFactor: cardHeight / cardWidth,
+                    heightFactor: cardWidth / cardHeight,
+                    child: Hero(
+                      tag: 'card_${cards[index].id}',
+                      flightShuttleBuilder: (
+                          BuildContext context,
+                          Animation<double> animation,
+                          _,
+                          __,
+                          ___,
+                          ) {
+                        final rotationAnimation =
                         Tween<double>(begin: -pi / 2, end: pi).animate(
-                      CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOut,
-                      ),
-                    );
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOut,
+                          ),
+                        );
 
-                    final flipAnimation =
+                        final flipAnimation =
                         Tween<double>(begin: 0, end: pi).animate(
-                      CurvedAnimation(
-                        parent: animation,
-                        curve: const Interval(
-                          0.3,
-                          1,
-                          curve: Curves.easeOut,
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: const Interval(
+                              0.3,
+                              1,
+                              curve: Curves.easeOut,
+                            ),
+                          ),
+                        );
+
+                        return Material(
+                          color: Colors.transparent,
+                          child: AnimatedBuilder(
+                            animation: animation,
+                            builder: (context, child) {
+                              return Transform(
+                                transform: Matrix4.identity()
+                                  ..setEntry(3, 2, 0.001)
+                                  ..rotateZ(rotationAnimation.value)
+                                  ..rotateX(flipAnimation.value),
+                                alignment: Alignment.center,
+                                child: Transform.flip(
+                                  flipX: animation.value > 0.5,
+                                  child: CreditCard(
+                                    width: cardWidth,
+                                    data: cards[index],
+                                    isFront: animation.value > 0.5,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Transform.rotate(
+                        angle: -pi / 2,
+                        child: CreditCard(
+                          width: cardWidth,
+                          data: cards[index],
                         ),
                       ),
-                    );
-
-                    return Material(
-                      color: Colors.transparent,
-                      child: AnimatedBuilder(
-                        animation: animation,
-                        builder: (context, child) {
-                          return Transform(
-                            transform: Matrix4.identity()
-                              ..setEntry(3, 2, 0.001)
-                              ..rotateZ(rotationAnimation.value)
-                              ..rotateX(flipAnimation.value),
-                            alignment: Alignment.center,
-                            child: Transform.flip(
-                              flipX: animation.value > 0.5,
-                              child: CreditCard(
-                                width: cardWidth,
-                                data: cards[index],
-                                isFront: animation.value > 0.5,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                  child: Transform.rotate(
-                    angle: -pi / 2,
-                    child: CreditCard(
-                      width: cardWidth,
-                      data: cards[index],
                     ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ):Container(),
+                  );
+                },
+              ),
+            ):Container(),
+          );
+        },
       ),
     );
   }
