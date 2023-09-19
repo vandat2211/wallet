@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/styles.dart';
 
@@ -26,7 +27,7 @@ class CreditCard extends StatelessWidget {
       height: height,
       width: width,
       decoration: BoxDecoration(
-        // color: data.style.color,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(AppBorderRadius.xxl),
         boxShadow: [
           BoxShadow(
@@ -34,17 +35,9 @@ class CreditCard extends StatelessWidget {
             blurRadius: 15,
           ),
         ],
-        image:isFront ?DecorationImage(
-          image: FileImage(File(data.imagePath2)),
-          fit: BoxFit.cover,
-        )
-        :DecorationImage(
-          image: FileImage(File(data.imagePath)),
-          fit: BoxFit.cover,
-        ),
       ),
       clipBehavior: Clip.hardEdge,
-      // child: isFront ? _CreditCardFront(data) : _CreditCardBack(data),
+      child: isFront ? _CreditCardFront(data) : _CreditCardBack(data),
     );
   }
 }
@@ -56,23 +49,11 @@ class _CreditCardFront extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: Image(
-              image: FileImage(File(data.imagePath)),
-              width: 45,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ],
-      ),
-    );
+    return data.imagePath2.contains("https://")?
+    SvgPicture.network(data.imagePath2, // Thay thế bằng URL của hình ảnh SVG của bạn
+      fit: BoxFit.contain,
+    ):
+        Image.file(File(data.imagePath2),fit: BoxFit.cover,width: 45,);
   }
 }
 
@@ -83,22 +64,10 @@ class _CreditCardBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-            ],
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(""),
-          ),
-        ],
-      ),
-    );
+    return data.imagePath.contains("https://")?
+    SvgPicture.network(data.imagePath, // Thay thế bằng URL của hình ảnh SVG của bạn
+      fit: BoxFit.contain,
+    ):
+    Image.file(File(data.imagePath),fit: BoxFit.cover,width: 45,);
   }
 }

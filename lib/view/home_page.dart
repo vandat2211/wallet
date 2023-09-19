@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:wallet/core/data.dart';
 import 'package:wallet/core/styles.dart';
 import 'package:wallet/core/widgets/wallet.dart';
@@ -176,7 +177,18 @@ class _NotificationsPageState extends State<_NotificationsPage> {
             if(cards.isNotEmpty) listID.clear();
             }
           );
-        },)],
+        },),
+        IconButton(onPressed: () async {
+          List<int> list = [];
+          for (var element in cards) {
+            list.add(element.id!);
+          }
+          await imageDb.deleteMultipleImages(list);
+          cards = await imageDb.getAllImages();
+          setState(() {
+
+          });
+        }, icon: Icon(Icons.delete_sweep_sharp))],
       ),
     body: Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -227,7 +239,9 @@ class _NotificationsPageState extends State<_NotificationsPage> {
                 child: Stack(
                   children: [
                     ClipRRect(
-                      child: Image.file(File(cards[index].imagePath)),
+                      child:cards[index].imagePath.contains("https://")?
+                      SvgPicture.network(cards[index].imagePath):
+                      Image.file(File(cards[index].imagePath)),
                     ),
                     if (delete)
                       Positioned(

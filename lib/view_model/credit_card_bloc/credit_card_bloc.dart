@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wallet/view_model/bloc_state.dart';
 
@@ -8,6 +10,7 @@ import '../bloc_event.dart';
 class CreditCardBloc extends Bloc<CreditCardEvent, CreditCardState> {
   final imageDb = ImageDatabase();
   List<CreditCardData> cards =[];
+  List<CreditCardData> randomList = [];
   CreditCardBloc():super(CreditCardState()){
     on<GetDataEvent>(_getDataEvent);
     on<DeleteCardEvent>(_deleteCardEvent);
@@ -16,13 +19,17 @@ class CreditCardBloc extends Bloc<CreditCardEvent, CreditCardState> {
   void _getDataEvent(
       GetDataEvent event, Emitter<CreditCardState> emitter) async {
     cards = await imageDb.getAllImages();
-    emitter(state.copyWith(cardss: cards));
+    var random = Random();
+    cards.shuffle(random);
+    randomList=cards.take(10).toList();
+    emitter(state.copyWith(cardss: randomList));
   }
   void _deleteCardEvent(
       DeleteCardEvent event, Emitter<CreditCardState> emitter) async {
     await imageDb.deleteImage(event.id);
-    cards = await imageDb.getAllImages();
-    emitter(state.copyWith(cardss: cards,formStatus: SubmissionSuccessDelete()));
+    // cards = await imageDb.getAllImages();
+    randomList.remove(event.creditCardData);
+    emitter(state.copyWith(cardss: randomList,formStatus: SubmissionSuccessDelete()));
   }
   void _addCardEvent(
       AddCardEvent event, Emitter<CreditCardState> emitter) async {
@@ -38,7 +45,8 @@ class CreditCardEvent extends BlocEvent {
 class GetDataEvent extends  CreditCardEvent{}
 class DeleteCardEvent extends  CreditCardEvent{
   final int id;
-  DeleteCardEvent(this.id);
+  final CreditCardData creditCardData;
+  DeleteCardEvent(this.id,this.creditCardData);
 }
 class AddCardEvent extends  CreditCardEvent{
   final CreditCardData creditCardData;

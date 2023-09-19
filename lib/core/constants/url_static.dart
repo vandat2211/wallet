@@ -157,4 +157,5 @@ class UrlStatic {
 
   static const String URI_DMUC_NGHANH_NGHE = "/api/getDmucnnghe";
   static const String URI_DMUC_QUOC_GIA = "/api/dmucQuocGia";
+  static const String pokemon = "?offset=0&limit=40";
 }

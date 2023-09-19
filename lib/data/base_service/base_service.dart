@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 
 import 'package:dio/dio.dart';
@@ -53,14 +54,25 @@ class BaseServices {
     Map<String, dynamic>? body,
     // ignore: avoid_positional_boolean_parameters
      BuildContext? context,
-  }) async {
+    String method = 'GET'
+      }) async {
     if (showLoading) {
       DialogAlert.showMLoadding(context!);
     }
-
+     Response<dynamic> response = Response(requestOptions: RequestOptions());
     try {
-      final Response<dynamic> response =
-          await dio.post(subUri, data: body ?? {});
+      if(method == "GET"){
+        response = await dio.get(subUri, data: body ?? {});
+      } else if (method == 'POST') {
+    response = await dio.post(subUri, data: body ?? {});
+    } else if (method == 'DELETE') {
+    response = await dio.delete(subUri, data: body ?? {});
+    } else {
+    // Handle other HTTP methods here (PUT, PATCH, etc.)
+    // Thêm xử lý cho các phương thức HTTP khác ở đây (PUT, PATCH, vv.)
+    }
+
+      print("response:${response}");
       if (showLoading) {
         // Navigator.of(context).pop(true);
         Navigator.pop(context!);

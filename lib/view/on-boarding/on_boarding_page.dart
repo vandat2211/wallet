@@ -10,6 +10,7 @@ import 'package:wallet/login_model.dart';
 import 'package:wallet/view/home_page.dart';
 
 import '../../core/constants/constants.dart';
+import '../../core/data_local/sql_lite.dart';
 
 class OnBoardingPage extends StatefulWidget {
   const OnBoardingPage({super.key});
@@ -26,9 +27,11 @@ class _OnBoardingPageState extends State<OnBoardingPage>
   late final PageController pageController;
   static const viewportFraction = 0.7;
   int activeIndex = 0;
-
+  final imageDb = ImageDatabase();
+  List<CreditCardData> cards =[];
   @override
   void initState() {
+    getData();
     pageController = PageController(viewportFraction: viewportFraction);
     animationController = AnimationController(
       vsync: this,
@@ -42,7 +45,9 @@ class _OnBoardingPageState extends State<OnBoardingPage>
         Tween<double>(begin: 0, end: 30 * pi / 180).animate(curvedAnimation);
     super.initState();
   }
-
+Future<void> getData() async {
+  cards = await imageDb.getAllImages();
+}
   @override
   void dispose() {
     animationController.dispose();
@@ -153,11 +158,6 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                   ),
                   FilledButton(
                     onPressed: () async {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (context) => const HomePage(),
-                        ),
-                      );
                       // await repositoryImpl.login(
                       //     LoginRequest(
                       //       requestId: Utils.getCurrentTimeStringRequest(),
@@ -171,6 +171,24 @@ class _OnBoardingPageState extends State<OnBoardingPage>
                       //       deviceId: "sdk_gphone64_x86_64",
                       //     ),
                       // context, Constants.FINGERPRINT_N);
+
+                      if(cards.isEmpty){
+                        await repositoryImpl.getData(context).then((value) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (context) => const HomePage(),
+                            ),
+                          );
+                        });
+                      }else{
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) => const HomePage(),
+                          ),
+                        );
+                      }
+
+
                     },
                     child: const Text(
                       'Get Started!',

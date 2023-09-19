@@ -12,5 +12,6 @@ enum AuthenticationStatus { unknown, authenticated, unauthenticated }
 enum GetPasswordBiometricStatus { successful, failure, moreThan3, none }
 abstract class Repository {
 
-  Future<void> login(LoginRequest request, BuildContext context, String auth);
+  // Future<void> login(LoginRequest request, BuildContext context, String auth);
+  Future<void> getData(BuildContext context);
 }

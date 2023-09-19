@@ -84,7 +84,7 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
                   });
                 },
                 onCardLongPress: (index) {
-                  BlocProvider.of<CreditCardBloc>(context).add(DeleteCardEvent(cards[index].id!));
+                  BlocProvider.of<CreditCardBloc>(context).add(DeleteCardEvent(cards[index].id!,cards[index]));
                 },
                 itemBuilder: (context, index) {
                   return Align(
@@ -143,12 +143,17 @@ class _CreditCardsPageState extends State<CreditCardsPage> {
                           ),
                         );
                       },
-                      child: Transform.rotate(
-                        angle: -pi / 2,
-                        child: CreditCard(
-                          width: cardWidth,
-                          data: cards[index],
-                        ),
+                      child:
+                      // Transform.rotate(
+                      //   angle: -pi / 2,
+                      //   child: CreditCard(
+                      //     width: cardWidth,
+                      //     data: cards[index],
+                      //   ),
+                      // ),
+                      CreditCard(
+                        width: cardWidth,
+                        data: cards[index],
                       ),
                     ),
                   );
